@@ -1,0 +1,14 @@
+/* Header.css */
+
+@keyframes flight {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-flight {
+  animation: flight 5s linear infinite;
+}
