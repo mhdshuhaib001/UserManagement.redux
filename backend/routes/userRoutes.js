@@ -1,5 +1,6 @@
 // userRoutes.js
 import express from "express";
+import userImage from '../config/multer.js'
 import {
   authUser,
   RegisterUser,

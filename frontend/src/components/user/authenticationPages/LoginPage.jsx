@@ -1,15 +1,36 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../../../slices/usersApiSlice';
+import { setCredentials } from '../../../slices/authSlice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const [login, { isLoading }] = useLoginMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/');
+    }
+  }, [navigate, userInfo]);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
+    try {
+      const userData = await login({ email, password }).unwrap();
+      dispatch(setCredentials(userData));
+      toast.success('Login successful!');
+      navigate('/');
+    } catch (err) {
+      toast.error('Failed to login: ' + err.data?.message || err.error);
+    }
   };
 
   return (
@@ -61,24 +82,28 @@ const LoginPage = () => {
             <button
               type="submit"
               className="w-full bg-cyan-700 text-white py-2 rounded-lg hover:bg-cyan-600 transition duration-300"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? 'Loading...' : 'Login'}
             </button>
           </div>
-       
         </form>
         <div className="text-center">
-            <a href="#" className="text-blue-500 hover:underline">
-              Forgot your password?
-            </a>
-          </div>
-          <div className="text-center mt-4">
-            <a className="text-slate-100 ">Don't have an account?</a>
-            <button onClick={()=> navigate('/signup')} className="ml-2 text-gray-300 hover:underline">
-              Sign up
-            </button>
-          </div>
+          <a href="#" className="text-blue-500 hover:underline">
+            Forgot your password?
+          </a>
+        </div>
+        <div className="text-center mt-4">
+          <span className="text-slate-100">Don't have an account?</span>
+          <button
+            onClick={() => navigate('/signup')}
+            className="ml-2 text-gray-300 hover:underline"
+          >
+            Sign up
+          </button>
+        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

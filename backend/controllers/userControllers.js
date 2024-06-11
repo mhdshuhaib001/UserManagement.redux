@@ -1,15 +1,16 @@
 import AsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-import generateTocken from "../util/generateToken.js";
+import generateToken from "../util/generateToken.js";
 import bcrypt from "bcryptjs";
 
+// User Authentication
 const authUser = AsyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
 
   if (user && (await bcrypt.compare(password, user.password))) {
-    generateTocken(res, user._id);
-    res.status(201).json({
+    generateToken(res, user._id);
+    res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -19,6 +20,7 @@ const authUser = AsyncHandler(async (req, res) => {
   }
 });
 
+// User Registration
 const RegisterUser = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -37,7 +39,7 @@ const RegisterUser = AsyncHandler(async (req, res) => {
   });
 
   if (user) {
-    generateTocken(res, user._id);
+    generateToken(res, user._id);
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -49,40 +51,47 @@ const RegisterUser = AsyncHandler(async (req, res) => {
   }
 });
 
+// User Logout
 const LogOutUser = AsyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
     httpOnly: true,
-    expires: Date(0),
+    expires: new Date(0),
   });
   res.status(200).json({ message: "User logged out" });
 });
 
+// Get User Profile
 const GetUserProfile = AsyncHandler(async (req, res) => {
-  res.status(200).json({ message: "User profile" });
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
 });
 
+// Update User Profile
 const UpdateUserProfile = AsyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
-
+  console.log('halooooo');
+  const user = await User.findById(req.body._id);
+console.log(user,'hallooo');
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
-
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
 
     const updatedUser = await user.save();
     res.status(200).json({
       _id: updatedUser._id,
       name: updatedUser.name,
-      email: updatedUser.email, 
+      email: updatedUser.email,
     });
   } else {
-    res.status(404);
-    throw new Error("User Is Not Found ");
+    res.status(404).json({ message: "User not found" });
   }
-  res.status(200).json({ message: "User profile updated" });
 });
 
 export {
