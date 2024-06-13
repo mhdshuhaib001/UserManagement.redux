@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';``
 import Home from '../components/Home/Home';
 import Profile from '../components/user/Profile/Profile';
 import Login from '../components/user/authenticationPages/LoginPage';

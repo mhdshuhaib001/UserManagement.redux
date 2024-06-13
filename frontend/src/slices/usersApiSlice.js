@@ -26,7 +26,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     updateProfile: builder.mutation({
       query: (data) => {
-        console.log("Request data:", data); // Log the data before sending the request
         return {
           url: `${USERS_URL}/profile`,
           method: "PUT",

@@ -17,6 +17,6 @@ router.post("/logout", LogOutUser);
 router
   .route("/profile")
   .get(protect, GetUserProfile)
-  .put(protect, UpdateUserProfile);
+  .put(protect,userImage.single("file"), UpdateUserProfile);
 
 export default router;

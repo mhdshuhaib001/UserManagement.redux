@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import userImage from "../../public/userImg.jpg"
+
 import { logout } from "../slices/authSlice";
 import { useLogoutMutation } from "../slices/usersApiSlice";
 
 const Header = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const isAuthenticated = !!userInfo;
-  console.log(userInfo, 'User info');
-  console.log(isAuthenticated, 'Is authenticated');
-    const dispatch = useDispatch();
+  console.log(userInfo, "User info");
+  console.log(isAuthenticated, "Is authenticated");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logOut] = useLogoutMutation();
   const [isOpen, setIsOpen] = useState(false);
@@ -20,13 +22,13 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('Attempting to log out');
+      console.log("Attempting to log out");
       await logOut().unwrap();
       dispatch(logout());
-      navigate('/login');
-      console.log('Logout successful, navigating to login page');
+      navigate("/login");
+      console.log("Logout successful, navigating to login page");
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error("Logout failed:", err);
     }
   };
 
@@ -34,7 +36,6 @@ const Header = () => {
     <header className="bg-gray-900 text-white py-5 px-8 md:px-12 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          {/* <img src="/logo.svg" alt="Travel App Logo" className="h-10 mr-4" /> */}
           <h1 className="text-2xl font-bold">Travel</h1>
         </div>
         <div className="flex items-center justify-center animate-flight">
@@ -104,7 +105,11 @@ const Header = () => {
                       className="flex items-center hover:text-gray-400 transition-colors duration-300 focus:outline-none"
                     >
                       <img
-                        src="/avatar.svg"
+                        src={
+                          userInfo.image
+                            ? `http://localhost:8000/images/${userInfo.image}`
+                            : userImage
+                        }
                         alt="User Avatar"
                         className="h-8 w-8 rounded-full mr-2"
                       />
@@ -121,11 +126,10 @@ const Header = () => {
                         />
                       </svg>
                     </button>
-                    {/* Dropdown menu */}
                     {isOpen && (
                       <div className="absolute right-0 z-10 mt-2 w-36 bg-white rounded-md shadow-lg py-1">
                         <div className="px-2 py-1 text-sm text-gray-800 font-semibold border-b">
-                          Hello, {userInfo.data.name}
+                          Hello, {userInfo.name}
                         </div>
                         <button
                           onClick={() => navigate("/profile")}
